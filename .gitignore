@@ -1,0 +1,27 @@
+# Entornos virtuales
+ambiente/
+venv/
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Datos y Parquet (Suelen ser pesados)
+csv/batch-etl/*.parquet
+csv/clasificacion/*.csv
+data/images/
+data/videos/
+
+# Basura de Windows (ADS) y archivos del sistema
+*Zone.Identifier
+.DS_Store
+Thumbs.db
+
+# Pesos de Modelos (YOLO v8)
+*.pt
+
+# Base de datos local (Hive/Derby)
+metastore_db/
+derby.log
