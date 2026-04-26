@@ -1,4 +1,3 @@
-```markdown
 # GUÍA DEL PROYECTO FINAL
 
 ## 1. Información general
@@ -7,10 +6,7 @@
 **AI Data Engineer Final Project**
 
 ### Autor
-**[tu nombre]**
-
-### GitHub
-**[tu github]**
+Sergio Antonio Nuñez Lazo
 
 ### Descripción general
 Este proyecto implementa un pipeline de visión computacional y procesamiento batch orientado a ingeniería de datos. El sistema detecta objetos en imágenes y videos utilizando el modelo YOLOv8n, genera un conjunto de detecciones enriquecidas en formato CSV, aplica un proceso ETL batch incremental para limpiar y transformar los datos a formato Parquet, y prepara la información para su posterior carga y análisis en Apache Hive.
@@ -223,6 +219,7 @@ Elimina:
 
 ---
 
+```markdown
 ## 7. Datos de entrada
 
 Los datos de entrada del proyecto se encuentran en:
@@ -235,6 +232,8 @@ El conjunto de datos utilizado incluye:
 
 - al menos 20 imágenes,
 - al menos 2 videos.
+
+Tanto las imágenes como los videos utilizados en este proyecto fueron capturados personalmente con un **iPhone 16**, cumpliendo con el requisito de trabajar con material propio para la construcción del dataset.
 
 ### Formatos soportados
 
@@ -249,6 +248,15 @@ El conjunto de datos utilizado incluye:
 - `.mov`
 
 Los archivos se procesan automáticamente por el sistema de clasificación.
+
+### Imágenes
+
+Las fotografías fueron tomadas personalmente con un **iPhone 16** y almacenadas dentro del conjunto de datos del proyecto. Estas imágenes representan escenas reales capturadas por el autor y fueron utilizadas como entrada para el proceso de detección de objetos.
+
+### Videos
+
+Los videos también fueron grabados personalmente con un **iPhone 16** y forman parte del conjunto de entrada del sistema. Estos archivos se utilizan para extraer detecciones por frame y generar información temporal agregada, incluyendo la columna `window_10s`.
+
 
 ---
 
