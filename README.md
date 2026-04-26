@@ -81,18 +81,20 @@ Se recomienda trabajar dentro de un entorno virtual para aislar las dependencias
 └── metastore_db
 ```
 
-## Datos de entrada
+## 7. Datos de entrada
 
-El proyecto trabaja con imágenes y videos almacenados en la carpeta:
+Los datos de entrada del proyecto se encuentran en:
 
 ```bash
 codigo/data
 ```
 
-Dentro de esta carpeta se consideran archivos de entrada para clasificación, incluyendo al menos:
+El conjunto de datos utilizado incluye:
 
-- 20 imágenes
-- 2 videos
+- al menos 20 imágenes,
+- al menos 2 videos.
+
+Tanto las imágenes como los videos utilizados en este proyecto fueron capturados personalmente con un **iPhone 16**, cumpliendo con el requisito de trabajar con material propio para la construcción del dataset.
 
 ### Formatos soportados
 
@@ -106,7 +108,15 @@ Dentro de esta carpeta se consideran archivos de entrada para clasificación, in
 - `.avi`
 - `.mov`
 
-El sistema procesa automáticamente los archivos disponibles en las carpetas de datos sin necesidad de especificar manualmente cada archivo.
+Los archivos se procesan automáticamente por el sistema de clasificación.
+
+### Imágenes
+
+Las fotografías fueron tomadas personalmente con un **iPhone 16** y almacenadas dentro del conjunto de datos del proyecto. Estas imágenes representan escenas reales capturadas por el autor y fueron utilizadas como entrada para el proceso de detección de objetos.
+
+### Videos
+
+Los videos también fueron grabados personalmente con un **iPhone 16** y forman parte del conjunto de entrada del sistema. Estos archivos se utilizan para extraer detecciones por frame y generar información temporal agregada, incluyendo la columna `window_10s`.
 
 ---
 
