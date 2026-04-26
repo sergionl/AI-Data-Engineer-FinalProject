@@ -1,17 +1,11 @@
 # Variables
-PYTHON = ./ambiente/bin/python3
-PIP = ./ambiente/bin/pip
+PYTHON = ./ambiente/venv/bin/python3
+PIP = ./ambiente/venv/bin/pip
 
 .PHONY: setup install test lint format run-clasificacion run-etl sql-init run-all clean help
 
 help: ## Muestra los comandos disponibles
-	@grep -E '^[a-zA-Z_-]+:.*?## .*
-$$
-' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n",
-$$
-1, 
-$$
-2}'
+→@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 setup: ## Crea el entorno virtual e instala dependencias
 	python3 -m venv ambiente

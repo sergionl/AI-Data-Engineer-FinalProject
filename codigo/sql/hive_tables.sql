@@ -1,27 +1,42 @@
 CREATE DATABASE IF NOT EXISTS yolo_project;
 USE yolo_project;
 
-CREATE EXTERNAL TABLE detections (
-    detection_id STRING,
-    ingestion_date STRING,
+CREATE EXTERNAL TABLE IF NOT EXISTS detections (
     source_type STRING,
     source_id STRING,
     frame_number INT,
-    timestamp_sec DOUBLE,
     class_id INT,
     class_name STRING,
     confidence DOUBLE,
-    x_min DOUBLE,
-    y_min DOUBLE,
-    x_max DOUBLE,
-    y_max DOUBLE,
-    bbox_area DOUBLE,
+
+    x_min INT,
+    y_min INT,
+    x_max INT,
+    y_max INT,
+
+    width INT,
+    height INT,
+    area_pixels INT,
+
+    frame_width INT,
+    frame_height INT,
     bbox_area_ratio DOUBLE,
+
     center_x DOUBLE,
     center_y DOUBLE,
+    center_x_norm DOUBLE,
+    center_y_norm DOUBLE,
+
     position_region STRING,
-    dominant_color STRING,
-    window_10s INT
+
+    dominant_color_name STRING,
+    dom_r INT,
+    dom_g INT,
+    dom_b INT,
+
+    timestamp_sec DOUBLE,
+    ingestion_date STRING,
+    detection_id STRING
 )
 STORED AS PARQUET
 LOCATION '/user/hadoop/yolo_data/';

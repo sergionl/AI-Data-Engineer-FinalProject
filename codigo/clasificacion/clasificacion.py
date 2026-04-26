@@ -60,7 +60,7 @@ def get_model():
 # =========================
 
 def get_color_name(r, g, b):
-        """
+    """
     Clasifica un color RGB en una etiqueta básica de color.
 
     Args:
@@ -95,7 +95,7 @@ def get_color_name(r, g, b):
 # =========================
 
 def extract_detections(results, frame, source_type, source_id, frame_number, model_obj, fps=None):
-     """
+    """
     Extrae atributos enriquecidos de las detecciones generadas por el modelo.
 
     A partir del resultado de inferencia sobre una imagen o frame de video,
