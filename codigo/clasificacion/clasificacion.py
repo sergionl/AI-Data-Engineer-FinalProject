@@ -24,50 +24,58 @@ VIDEOS_PATH = str(videos_path)
 csv_path = script_dir.parent / "csv" / "clasificacion" / "detections.csv"
 CSV_PATH = str(csv_path)
 
-model = YOLO("yolov8n.pt")
+model = None
+
+
+def get_model():
+    """Carga el modelo YOLO solo cuando se necesita."""
+    global model
+    if model is None:
+        model = YOLO("yolov8n.pt")
+    return model
+
 
 # =========================
 # COLOR
 # =========================
 
 def get_color_name(r, g, b):
+    """Determina un nombre de color simple a partir de valores RGB."""
     if r > 150 and g < 100 and b < 100:
         return "red"
-    elif g > 150 and r < 100:
+    if g > 150 and r < 100:
         return "green"
-    elif b > 150 and r < 100:
+    if b > 150 and r < 100:
         return "blue"
-    elif r > 200 and g > 200 and b > 200:
+    if r > 200 and g > 200 and b > 200:
         return "white"
-    elif r < 50 and g < 50 and b < 50:
+    if r < 50 and g < 50 and b < 50:
         return "black"
-    else:
-        return "other"
+    return "other"
+
 
 # =========================
 # EXTRACTOR
 # =========================
 
-def extract_detections(results, frame, source_type, source_id, frame_number, model, fps=None):
+def extract_detections(results, frame, source_type, source_id, frame_number, model_obj, fps=None):
+    """Extrae detecciones desde la salida del modelo y construye registros tabulares."""
     records = []
 
     if not results:
         return records
 
-    r = results[0]
+    result = results[0]
 
-    if r.boxes is None:
+    if result.boxes is None:
         return records
 
-    frame_height, frame_width = r.orig_shape[:2]
+    frame_height, frame_width = result.orig_shape[:2]
 
-    for i, box in enumerate(r.boxes):
-
-        # --- IDs y metadata ---
+    for box in result.boxes:
         ingestion_date = datetime.now().isoformat()
-        detection_id = str(uuid.uuid4()) 
+        detection_id = str(uuid.uuid4())
 
-        # --- BBOX ---
         x_min, y_min, x_max, y_max = box.xyxy[0].tolist()
 
         width = x_max - x_min
@@ -82,13 +90,10 @@ def extract_detections(results, frame, source_type, source_id, frame_number, mod
         center_x_norm = center_x / frame_width
         center_y_norm = center_y / frame_height
 
-        # --- POSICIÓN ---
         vertical = "top" if center_y_norm < 0.33 else "middle" if center_y_norm < 0.66 else "bottom"
         horizontal = "left" if center_x_norm < 0.33 else "center" if center_x_norm < 0.66 else "right"
-
         position_region = f"{vertical}-{horizontal}"
 
-        # --- COLOR ---
         x1, y1, x2, y2 = map(int, [x_min, y_min, x_max, y_max])
         roi = frame[y1:y2, x1:x2]
 
@@ -100,26 +105,17 @@ def extract_detections(results, frame, source_type, source_id, frame_number, mod
         b, g, r_color = avg_color
         dominant_color_name = get_color_name(r_color, g, b)
 
-        # --- VIDEO META ---
         timestamp_sec = frame_number / fps if (source_type == "video" and fps) else 0
 
-        # --- RECORD ---
         record = {
-            
-            # IDs y metadata
             "detection_id": detection_id,
             "ingestion_date": ingestion_date,
-
-            # A. Información Básica y de Modelo
             "source_type": source_type,
             "source_id": source_id,
             "frame_number": frame_number,
-
             "class_id": int(box.cls),
-            "class_name": model.names[int(box.cls)],
+            "class_name": model_obj.names[int(box.cls)],
             "confidence": float(box.conf),
-
-            # B. Información del Bounding Box
             "x_min": x_min,
             "y_min": y_min,
             "x_max": x_max,
@@ -135,27 +131,26 @@ def extract_detections(results, frame, source_type, source_id, frame_number, mod
             "center_x_norm": center_x_norm,
             "center_y_norm": center_y_norm,
             "position_region": position_region,
-
-            # C. Color Dominante
             "dominant_color_name": dominant_color_name,
             "dom_r": int(r_color),
             "dom_g": int(g),
             "dom_b": int(b),
-
-            # D. Metadatos de Video
-            "timestamp_sec": timestamp_sec
+            "timestamp_sec": timestamp_sec,
         }
 
         records.append(record)
 
     return records
 
+
 # =========================
 # IMÁGENES
 # =========================
 
 def process_images(path):
+    """Procesa todas las imágenes válidas de un directorio."""
     all_records = []
+    model_obj = get_model()
 
     for file in os.listdir(path):
         if file.lower().endswith((".jpg", ".png", ".jpeg")):
@@ -163,24 +158,27 @@ def process_images(path):
 
             image = cv2.imread(image_path)
             if image is None:
-                continue  # evita crashes
+                continue
 
-            results = model(image)
+            results = model_obj(image)
 
             records = extract_detections(
-                results, image, "image", file, 0, model
+                results, image, "image", file, 0, model_obj
             )
 
             all_records.extend(records)
 
     return all_records
 
+
 # =========================
 # VIDEOS
 # =========================
 
 def process_videos(path):
+    """Procesa todos los videos válidos de un directorio frame por frame."""
     all_records = []
+    model_obj = get_model()
 
     for file in os.listdir(path):
         if file.lower().endswith((".mp4", ".avi", ".mov")):
@@ -196,10 +194,10 @@ def process_videos(path):
                 if not ret:
                     break
 
-                results = model(frame)
+                results = model_obj(frame)
 
                 records = extract_detections(
-                    results, frame, "video", file, frame_number, model, fps
+                    results, frame, "video", file, frame_number, model_obj, fps
                 )
 
                 all_records.extend(records)
@@ -209,19 +207,23 @@ def process_videos(path):
 
     return all_records
 
-# =========================
-# RUN
-# =========================
-
-data = []
-data.extend(process_images(IMAGES_PATH))
-data.extend(process_videos(VIDEOS_PATH))
 
 # =========================
-# SAVE
+# MAIN
 # =========================
 
-df = pd.DataFrame(data)
-df.to_csv(CSV_PATH, index=False)
+def main():
+    """Ejecuta el pipeline completo de clasificación y exporta a CSV."""
+    data = []
+    data.extend(process_images(IMAGES_PATH))
+    data.extend(process_videos(VIDEOS_PATH))
 
-print("CSV generado con éxito")
+    df = pd.DataFrame(data)
+    Path(CSV_PATH).parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(CSV_PATH, index=False)
+
+    print("CSV generado con éxito")
+
+
+if __name__ == "__main__":
+    main()

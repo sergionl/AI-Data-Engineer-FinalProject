@@ -9,7 +9,7 @@ __pycache__/
 *$py.class
 
 # Datos y Parquet (Suelen ser pesados)
-csv/batch-etl/*.parquet
+csv/batch_etl/*.parquet
 csv/clasificacion/*.csv
 data/images/
 data/videos/
